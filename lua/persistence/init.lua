@@ -43,6 +43,17 @@ function M.stop()
 end
 
 function M.save()
+    -- 返回當前緩沖區個數
+  -- https://stackoverflow.com/questions/17931507/vimscript-number-of-listed-buffers
+  -- :echo len(getbufinfo({'buflisted':1}))
+  -- :lua print(vim.fn.len(vim.fn.getbufinfo({buflisted = 1})))
+
+  -- 判斷當前bur list個數,如果為0, 則不保存session
+  -- 在nvchad打開Startify的時候,馬上關閉(目前buf list數量為0), 跳過保存session
+  if vim.fn.len(vim.fn.getbufinfo({buflisted = 1})) == 0 then
+    return
+  end
+
   local tmp = vim.o.sessionoptions
   vim.o.sessionoptions = table.concat(Config.options.options, ",")
   vim.cmd("mks! " .. e(M.get_current()))
