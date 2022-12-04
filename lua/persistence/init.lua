@@ -43,16 +43,22 @@ function M.stop()
 end
 
 function M.save()
-    -- 返回當前緩沖區個數
-  -- https://stackoverflow.com/questions/17931507/vimscript-number-of-listed-buffers
-  -- :echo len(getbufinfo({'buflisted':1}))
-  -- :lua print(vim.fn.len(vim.fn.getbufinfo({buflisted = 1})))
+  -- 返回當前緩沖區個數
+  --   https://stackoverflow.com/questions/17931507/vimscript-number-of-listed-buffers
+  --   :echo len(getbufinfo({'buflisted':1}))
+  --   :lua print(vim.fn.len(vim.fn.getbufinfo({buflisted = 1})))
+  -- 獲取當前buf的文件名
+  --   vim.api.nvim_buf_get_name(0)
+  -- 獲取當前buf的行數
+  --   nvim_buf_line_count(0)
 
-  -- 判斷當前bur list個數,如果為0, 則不保存session
+  -- 判斷當前bur list個數,如果為0或者為1並名字和行數為空的時候不保存session
   -- 在nvchad打開Startify的時候,馬上關閉(目前buf list數量為0), 跳過保存session
-  if vim.fn.len(vim.fn.getbufinfo({buflisted = 1})) == 0 then
-    return
-  end
+  local buf_list_len = vim.fn.len(vim.fn.getbufinfo { buflisted = 1 })
+  if (buf_list_len == 0)
+    or (buf_list_len == 1
+      and (vim.api.nvim_buf_get_name(0) == "" or vim.api.nvim_buf_line_count(0) == 1))
+  then return end
 
   local tmp = vim.o.sessionoptions
   vim.o.sessionoptions = table.concat(Config.options.options, ",")
